@@ -134,11 +134,11 @@ resource "aws_security_group" "instance" {
   name_prefix = "tap-gig-instance-"
   vpc_id      = aws_vpc.tap_gig_vpc.id
 
-  # Ingress rules for allowing SSH and HTTP access from anywhere
+  # Ingress rules for allowing RDP and HTTP access from anywhere
   ingress {
-    description = "SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
+    description = "RDP from anywhere"
+    from_port   = 3389
+    to_port     = 3389
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -171,6 +171,13 @@ resource "aws_security_group" "elb" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
