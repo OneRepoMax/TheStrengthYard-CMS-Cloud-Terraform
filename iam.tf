@@ -31,6 +31,13 @@ resource "aws_iam_role" "codepipeline_codedeploy_role" {
         Principal = {
           Service = "ec2.amazonaws.com"
         }
+      },
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "elasticbeanstalk.amazonaws.com"
+        }
       }
     ]
   })
@@ -58,4 +65,14 @@ resource "aws_iam_policy_attachment" "ec2_policy_attachment" {
   name       = "MyCodeBuildPolicyAttachment"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
   roles      = [aws_iam_role.codepipeline_codedeploy_role.name]
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_managed_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.codepipeline_codedeploy_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "elastic_beanstalk_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-AWSElasticBeanstalk"
+  role       = aws_iam_role.codepipeline_codedeploy_role.name
 }

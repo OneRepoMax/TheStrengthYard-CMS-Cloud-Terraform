@@ -20,6 +20,7 @@ resource "aws_s3_bucket_acl" "codepipeline_artifacts" {
   acl    = "private"
 }
 
+# Creating CodePipeline
 resource "aws_codepipeline" "tap_gig_codepipeline" {
   name     = "tap-gig-codepipeline"
   role_arn = aws_iam_role.codepipeline_codedeploy_role.arn
@@ -50,38 +51,43 @@ resource "aws_codepipeline" "tap_gig_codepipeline" {
     }
   }
 
-#   stage {
-#     name = "Build"
+  # stage {
+  #   name = "Build"
 
-#     action {
-#       name            = "BuildAction"
-#       category        = "Build"
-#       owner           = "AWS"
-#       provider        = "CodeBuild"
-#       version         = "1"
-#       input_artifacts = ["SourceOutput"]
+  #   action {
+  #     name            = "BuildAction"
+  #     category        = "Build"
+  #     owner           = "AWS"
+  #     provider        = "CodeBuild"
+  #     version         = "1"
+  #     input_artifacts = ["SourceOutput"]
 
-#       configuration = {
-#         ProjectName = aws_codebuild_project.tap_gig_codebuild_project.name  # Replace with your CodeBuild project name
-#       }
-#     }
-#   }
+  #     configuration = {
+  #       ProjectName = aws_codebuild_project.tap_gig_codebuild_project.name  # Replace with your CodeBuild project name
+  #     }
+  #   }
+  # }
 
-  stage {
+ stage {
     name = "Deploy"
 
     action {
       name            = "DeployAction"
       category        = "Deploy"
       owner           = "AWS"
-      provider        = "CodeDeploy"
+      provider        = "ElasticBeanstalk" # Replace with "CodeDeploy" if you want to use CodeDeploy
       version         = "1"
       input_artifacts = ["SourceOutput"]
 
+
+      # configuration = {
+      #     ApplicationName     = aws_codedeploy_app.tap_gig_cd_app.name
+      #     DeploymentGroupName = aws_codedeploy_deployment_group.tap_gig_cd_deployment_group.deployment_group_name 
+      # }
       configuration = {
-        ApplicationName  = aws_codedeploy_app.tap_gig_cd_app.name
-        DeploymentGroupName = aws_codedeploy_deployment_group.tap_gig_cd_deployment_group.deployment_group_name
+        ApplicationName  = aws_elastic_beanstalk_application.tap_gig_app.name
+        EnvironmentName  = aws_elastic_beanstalk_environment.tap_gig_env.name
       }
     }
-  }
+  } 
 }

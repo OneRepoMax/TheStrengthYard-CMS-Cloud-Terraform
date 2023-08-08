@@ -17,12 +17,12 @@ dir
 # :: creating a directory
 mkdir dd
 
-# :: ii* -  The File names which start with ii are move to the directory dd
+# :: ii* -  The File names which start with ii are moved to the directory dd
 move ii* dd/
 
 # :: Creating a new html file 
 echo This is my new WebPage >index.html
 
-# :: visitng to the localhost
+# :: Go to localhost
 start http://127.0.0.1
 </powershell>
