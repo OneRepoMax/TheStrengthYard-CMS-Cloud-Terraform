@@ -19,6 +19,8 @@ Link to Slides: https://docs.google.com/presentation/d/17zuJ6sH2_kKMItTLBuvlGAZF
 
 Link to the presentation & video demonstration of deployment: https://youtu.be/SsGohLOr138
 
+Link to the deployed Elastic Beanstalk application: http://tap-gig-env.eba-rmxaef7f.ap-southeast-1.elasticbeanstalk.com/  _(PS: This will be taken down soon and won't be up forever, do not want to incur too much cost on my AWS account haha)_
+
 ## Assumptions & Constraints
 From the instructions given, these were some of the assumptions that I made:
 1) "_infrastructure must be provisioned automatically without manual intervention_" -> By this, I assume that **manual intervention** refers to logging in to AWS Management Console UI and launching the AWS Services from there. To tackle this, we use Terraform (Infrastructure as Code) to spin up the required AWS Services instead
