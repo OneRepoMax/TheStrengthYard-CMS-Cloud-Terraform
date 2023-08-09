@@ -7,6 +7,7 @@
 #     type = "CODEPIPELINE"
 #   }
 
+# # Unfortunately Windows Server 2019 Container not supported in ap-southeast-1 region for now
 #   environment {
 #     compute_type = "BUILD_GENERAL1_MEDIUM"
 #     image        = "aws/codebuild/windows-base:2019-1.0"  # Use Windows Server 2019 base image
@@ -15,5 +16,6 @@
 
 #   source {
 #     type = "CODEPIPELINE"
+#     buildspec = "buildspec.yml"
 #   }
 # }
