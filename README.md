@@ -4,7 +4,7 @@ Hello! This is my repo for my Terraform config files for the TAP GIG Assessment.
 By running this Terraform configuration, this is the infrastructure that will be loaded in the AWS Account:
 
 ## Architecture Diagram
-![TAP-GIG-Infrastructure Diagram drawio](https://github.com/mukminpitoyo/TAP-terraform/assets/89132892/e6f3613f-2509-4fe1-aaca-369ce3cf533a)
+![TAP-GIG-Infrastructure Diagram drawio](https://github.com/mukminpitoyo/TAP-terraform/assets/89132892/5812f186-79d5-4024-9e59-a3d56bb3899b)
 
 ## Requirements of the Infra
 As specified previously, these were the requirements of the web application/infrastructure:
