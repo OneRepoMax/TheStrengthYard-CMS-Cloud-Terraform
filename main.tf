@@ -349,7 +349,7 @@ resource "aws_iam_instance_profile" "tap_gig_instance_profile" {
 # Defining the Elastic Beanstalk TAP-GIG Application
 resource "aws_elastic_beanstalk_application" "tap_gig_app" {
   name        = "tap-gig-app"
-  description = "TAP-GIG Application"
+  description = "TAP-GIG Application - Sample ASP.NET Application"
 }
 
 # resource "aws_elastic_beanstalk_application_version" "tap_gig_app_version" {

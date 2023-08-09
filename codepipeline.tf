@@ -44,7 +44,7 @@ resource "aws_codepipeline" "tap_gig_codepipeline" {
     # Please change the below Github configurations accordingly
       configuration = {
         Owner             = "mukminpitoyo"
-        Repo              = "deliveryheroes"
+        Repo              = "BeanstalkDotNetSample"
         Branch            = "main"
         OAuthToken        = var.github_token  # Define the GitHub token as a variable
       }
