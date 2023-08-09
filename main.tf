@@ -276,89 +276,17 @@ resource "aws_security_group" "elb" {
   }
 }
 
-# Creating ELB
-# resource "aws_elb" "tap_gig_elb" {
-#   name               = "tap-gig-elb"
-#   subnets            = [
-#     aws_subnet.public_a.id,
-#     aws_subnet.public_b.id,
-#     aws_subnet.public_c.id
-#     ]
-#   security_groups    = [aws_security_group.elb.id]
-#   cross_zone_load_balancing  = true
-#   idle_timeout       = 400
-#   connection_draining = true
-#   connection_draining_timeout = 300
-#   tags = {
-#     Name = "tap-gig-elb"
-#   }
-#   listener {
-#     instance_port     = 80
-#     instance_protocol = "http"
-#     lb_port           = 80
-#     lb_protocol       = "http"
-#   }
-# }
-
 # Creating Instance Profile
 resource "aws_iam_instance_profile" "tap_gig_instance_profile" {
   name = "tap-gig-instance-profile"
   role = aws_iam_role.codepipeline_codedeploy_role.id
 }
 
-# Creating EC2 Launch Configuration and ASG
-# resource "aws_launch_configuration" "tap_gig_lc" {
-#   name_prefix                 = "tap-gig-lc"
-#   image_id                    = "ami-0a720e9f14071b468"  # Microsoft Windows Server 2019 Base
-#   instance_type               = "t2.micro"  # Replace with your desired instance type
-#   security_groups             = [aws_security_group.instance.id]
-#   associate_public_ip_address = false
-#   key_name                    = "tap-gig-keypair"  # Replace with your EC2 key pair name
-#   user_data                   = file("install.sh")  # Replace with your user data script, if any
-
-#   # Attach the instance profile to launch configuration
-#   iam_instance_profile = aws_iam_instance_profile.tap_gig_instance_profile.name
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_autoscaling_group" "example" {
-#   name                 = "tap-gig-asg"
-#   launch_configuration = aws_launch_configuration.tap_gig_lc.name
-#   min_size             = 2  # Replace with your desired minimum number of instances
-#   max_size             = 4  # Replace with your desired maximum number of instances
-#   desired_capacity     = 2  # Replace with your desired initial number of instances
-#   vpc_zone_identifier  = [
-#     aws_subnet.private_a.id, 
-#     aws_subnet.private_b.id, 
-#     aws_subnet.private_c.id
-#     ]
-#   health_check_type    = "ELB"
-#   load_balancers       = [aws_elb.tap_gig_elb.name]
-#   tags = [
-#     {
-#       key                 = "Name"
-#       value               = "tap-gig-asg"
-#       propagate_at_launch = true
-#     }
-#   ]
-# }
-
 # Defining the Elastic Beanstalk TAP-GIG Application
 resource "aws_elastic_beanstalk_application" "tap_gig_app" {
   name        = "tap-gig-app"
   description = "TAP-GIG Application - Sample ASP.NET Application"
 }
-
-# resource "aws_elastic_beanstalk_application_version" "tap_gig_app_version" {
-#   name          = "tap-gig-app-version"
-#   application   = aws_elastic_beanstalk_application.tap_gig_app.name
-#   description   = "Application version from GitHub"
-#   bucket = aws_s3_bucket.codepipeline_artifacts.id
-#   key    = "tap-gig-codepipeline/SourceOutp/8xFKXQ4.zip" # Update with the actual path
-# }
 
 # # Defining the Elastic Beanstalk TAP-GIG Environment
 resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
@@ -372,12 +300,6 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
     name      = "VPCId"
     value     = aws_vpc.tap_gig_vpc.id
   }
-
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "APPLICATION_VERSION"
-  #   value     = aws_elastic_beanstalk_application_version.tap_gig_app_version.name
-  # }
 
   setting {
     namespace = "aws:ec2:vpc"
@@ -418,18 +340,6 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
     value     = "2"
   }
 
-  # setting {
-  #   namespace = "aws:autoscaling:asg"
-  #   name      = "Availability Zones"
-  #   value     = "Any 2"
-  # }
-
-  # setting {
-  #   namespace = "aws:ec2:vpc"
-  #   name      = "AssociatePublicIpAddress"
-  #   value     = "false"
-  # }
-
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "LoadBalancerType"
@@ -464,3 +374,67 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
     value     = aws_security_group.elb.id
   }
 }
+
+# Creating EC2 Launch Configuration and ASG -- Skipped!
+# resource "aws_launch_configuration" "tap_gig_lc" {
+#   name_prefix                 = "tap-gig-lc"
+#   image_id                    = "ami-0a720e9f14071b468"  # Microsoft Windows Server 2019 Base
+#   instance_type               = "t2.micro"  # Replace with your desired instance type
+#   security_groups             = [aws_security_group.instance.id]
+#   associate_public_ip_address = false
+#   key_name                    = "tap-gig-keypair"  # Replace with your EC2 key pair name
+#   user_data                   = file("install.sh")  # Replace with your user data script, if any
+
+#   # Attach the instance profile to launch configuration
+#   iam_instance_profile = aws_iam_instance_profile.tap_gig_instance_profile.name
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
+
+# resource "aws_autoscaling_group" "example" {
+#   name                 = "tap-gig-asg"
+#   launch_configuration = aws_launch_configuration.tap_gig_lc.name
+#   min_size             = 2  # Replace with your desired minimum number of instances
+#   max_size             = 4  # Replace with your desired maximum number of instances
+#   desired_capacity     = 2  # Replace with your desired initial number of instances
+#   vpc_zone_identifier  = [
+#     aws_subnet.private_a.id, 
+#     aws_subnet.private_b.id, 
+#     aws_subnet.private_c.id
+#     ]
+#   health_check_type    = "ELB"
+#   load_balancers       = [aws_elb.tap_gig_elb.name]
+#   tags = [
+#     {
+#       key                 = "Name"
+#       value               = "tap-gig-asg"
+#       propagate_at_launch = true
+#     }
+#   ]
+# }
+
+# Creating ELB -- Skipped! Beanstalk will do this for us
+# resource "aws_elb" "tap_gig_elb" {
+#   name               = "tap-gig-elb"
+#   subnets            = [
+#     aws_subnet.public_a.id,
+#     aws_subnet.public_b.id,
+#     aws_subnet.public_c.id
+#     ]
+#   security_groups    = [aws_security_group.elb.id]
+#   cross_zone_load_balancing  = true
+#   idle_timeout       = 400
+#   connection_draining = true
+#   connection_draining_timeout = 300
+#   tags = {
+#     Name = "tap-gig-elb"
+#   }
+#   listener {
+#     instance_port     = 80
+#     instance_protocol = "http"
+#     lb_port           = 80
+#     lb_protocol       = "http"
+#   }
+# }
