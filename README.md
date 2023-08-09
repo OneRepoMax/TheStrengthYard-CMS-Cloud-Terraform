@@ -15,7 +15,7 @@ As specified previously, these were the requirements of the web application/infr
 5) The design should be based on best practices with security in mind
 
 ## Deck and Video Explanation
-Link to Slides: 
+Link to Slides: https://docs.google.com/presentation/d/17zuJ6sH2_kKMItTLBuvlGAZF6J7Y9Nw4uQPQVVeJgtc/edit?usp=sharing
 
 Link to the video demonstration of deployment: 
 
