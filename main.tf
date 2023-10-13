@@ -249,8 +249,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     name      = "Subnets"
     value     = "${join(",", 
     [aws_subnet.private_a.id], 
-    [aws_subnet.private_b.id], 
-    [aws_subnet.private_c.id])}"
+    [aws_subnet.private_b.id])}"
   }
 
   setting {
@@ -306,8 +305,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     name      = "ELBSubnets"
     value     = join(",", [
       aws_subnet.public_a.id,
-      aws_subnet.public_b.id,
-      aws_subnet.public_c.id
+      aws_subnet.public_b.id
     ])
   }
 
