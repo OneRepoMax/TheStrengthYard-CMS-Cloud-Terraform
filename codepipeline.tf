@@ -1,8 +1,8 @@
 # Creating CodePipeline and S3 bucket for artifacts
 resource "aws_s3_bucket" "codepipeline_artifacts" {
-  bucket = "tap-gig-codepipeline-artifacts-bucket" 
+  bucket = "tsy-iabs-codepipeline-artifacts-bucket" 
   tags = {
-    Name = "tap-gig-codepipeline-artifacts-bucket"
+    Name = "tsy-iabs-codepipeline-artifacts-bucket"
   }
 }
 
@@ -21,8 +21,8 @@ resource "aws_s3_bucket_acl" "codepipeline_artifacts" {
 }
 
 # Creating CodePipeline
-resource "aws_codepipeline" "tap_gig_codepipeline" {
-  name     = "tap-gig-codepipeline"
+resource "aws_codepipeline" "tsy_iabs_codepipeline" {
+  name     = "tsy-iabs-codepipeline"
   role_arn = aws_iam_role.codepipeline_codedeploy_role.arn
 
   artifact_store {
@@ -85,8 +85,8 @@ resource "aws_codepipeline" "tap_gig_codepipeline" {
       #     DeploymentGroupName = aws_codedeploy_deployment_group.tap_gig_cd_deployment_group.deployment_group_name 
       # }
       configuration = {
-        ApplicationName  = aws_elastic_beanstalk_application.tap_gig_app.name
-        EnvironmentName  = aws_elastic_beanstalk_environment.tap_gig_env.name
+        ApplicationName  = aws_elastic_beanstalk_application.tsy_iabs_app.name
+        EnvironmentName  = aws_elastic_beanstalk_environment.tsy_iabs_env.name
       }
     }
   } 

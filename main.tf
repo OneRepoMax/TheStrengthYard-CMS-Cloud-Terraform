@@ -3,212 +3,155 @@ provider "aws" {
 }
 
 # Creating VPC, IGW
-resource "aws_vpc" "tap_gig_vpc" {
+resource "aws_vpc" "tsy-iabs-vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = "tap-gig-vpc"
+    Name = "TSY-IABS-VPC"
   }
 }
 
-resource "aws_internet_gateway" "tap_gig_igw" {
-  vpc_id = aws_vpc.tap_gig_vpc.id
+resource "aws_internet_gateway" "tsy_iabs_igw" {
+  vpc_id = aws_vpc.tsy-iabs-vpc.id
   tags = {
-    Name = "TAP-GIG-Internet-Gateway"
+    Name = "TSY-IABS-Internet-Gateway"
   }
 }
 
 # Creating NAT Gateways and Elastic IPs for each subnet
-resource "aws_nat_gateway" "tap_gig_nat_a" {
-  allocation_id = aws_eip.tap_gig_nat_a.id
+resource "aws_nat_gateway" "tsy_iabs_nat_a" {
+  allocation_id = aws_eip.tsy_iabs_nat_a.id
   subnet_id     = aws_subnet.public_a.id
 
   tags = {
-    Name = "TAP-GIG-NAT-Gateway-a"
+    Name = "TSY-IABS-NAT-Gateway-a"
   }
 }
 
-resource "aws_nat_gateway" "tap_gig_nat_b" {
-  allocation_id = aws_eip.tap_gig_nat_b.id
+resource "aws_nat_gateway" "tsy_iabs_nat_b" {
+  allocation_id = aws_eip.tsy_iabs_nat_b.id
   subnet_id     = aws_subnet.public_b.id
 
   tags = {
-    Name = "TAP-GIG-NAT-Gateway-b"
+    Name = "TSY-IABS-NAT-Gateway-b"
   }
 }
 
-resource "aws_nat_gateway" "tap_gig_nat_c" {
-  allocation_id = aws_eip.tap_gig_nat_c.id
-  subnet_id     = aws_subnet.public_c.id
-
-  tags = {
-    Name = "TAP-GIG-NAT-Gateway-c"
-  }
-}
-
-resource "aws_eip" "tap_gig_nat_a" {
+resource "aws_eip" "tsy_iabs_nat_a" {
   vpc = true
 }
 
-resource "aws_eip" "tap_gig_nat_b" {
+resource "aws_eip" "tsy_iabs_nat_b" {
   vpc = true
 }
 
-resource "aws_eip" "tap_gig_nat_c" {
-  vpc = true
-}
-
-# Creating 3x public subnets, 1 for each AZ
+# Creating 2x public subnets, 1 for each AZ
 resource "aws_subnet" "public_a" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
+  vpc_id                  = aws_vpc.tsy-iabs-vpc.id
   cidr_block              = "10.0.0.0/24"
   availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = true
   tags = {
-    Name = "TAP-GIG-Public-Subnet-1a"
+    Name = "TSY-IABS-Public-Subnet-1a"
   }
 }
 
 resource "aws_subnet" "public_b" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
+  vpc_id                  = aws_vpc.tsy-iabs-vpc.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "ap-southeast-1b"
   map_public_ip_on_launch = true
   tags = {
-    Name = "TAP-GIG-Public-Subnet-1b"
+    Name = "TSY-IABS-Public-Subnet-1b"
   }
 }
 
-resource "aws_subnet" "public_c" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "ap-southeast-1c"
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "TAP-GIG-Public-Subnet-1c"
-  }
-}
-
-# Creating 3x private subnets, 1 for each AZ
+# Creating 2x private subnets, 1 for each AZ
 resource "aws_subnet" "private_a" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
+  vpc_id                  = aws_vpc.tsy-iabs-vpc.id
   cidr_block              = "10.0.3.0/24"
   availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = false
   tags = {
-    Name = "TAP-GIG-Private-Subnet-1a"
+    Name = "TSY-IABS-Private-Subnet-1a"
   }
 }
 
 resource "aws_subnet" "private_b" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
+  vpc_id                  = aws_vpc.tsy-iabs-vpc.id
   cidr_block              = "10.0.4.0/24"
   availability_zone       = "ap-southeast-1b"
   map_public_ip_on_launch = false
   tags = {
-    Name = "TAP-GIG-Private-Subnet-1b"
-  }
-}
-
-resource "aws_subnet" "private_c" {
-  vpc_id                  = aws_vpc.tap_gig_vpc.id
-  cidr_block              = "10.0.5.0/24"
-  availability_zone       = "ap-southeast-1c"
-  map_public_ip_on_launch = false
-  tags = {
-    Name = "TAP-GIG-Private-Subnet-1c"
+    Name = "TSY-IABS-Private-Subnet-1b"
   }
 }
 
 # Creating Public Route Table with Associations to Public Subnets
-resource "aws_route_table" "tap_gig_route_table_public" {
-  vpc_id = aws_vpc.tap_gig_vpc.id
+resource "aws_route_table" "tsy_iabs_route_table_public" {
+  vpc_id = aws_vpc.tsy-iabs-vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.tap_gig_igw.id
+    gateway_id = aws_internet_gateway.tsy_iabs_igw.id
   }
 
   tags = {
-    Name = "tap-gig-route-table-public"
+    Name = "tsy-iabs-route-table-public"
   }
 }
 
 resource "aws_route_table_association" "public_a" {
   subnet_id      = aws_subnet.public_a.id
-  route_table_id = aws_route_table.tap_gig_route_table_public.id
+  route_table_id = aws_route_table.tsy_iabs_route_table_public.id
 }
 
 resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.public_b.id
-  route_table_id = aws_route_table.tap_gig_route_table_public.id
-}
-
-resource "aws_route_table_association" "public_c" {
-  subnet_id      = aws_subnet.public_c.id
-  route_table_id = aws_route_table.tap_gig_route_table_public.id
+  route_table_id = aws_route_table.tsy_iabs_route_table_public.id
 }
 
 # Creating Private Route Table A for Subnet A
-resource "aws_route_table" "tap_gig_route_table_private_a" {
-  vpc_id = aws_vpc.tap_gig_vpc.id
+resource "aws_route_table" "tsy_iabs_route_table_private_a" {
+  vpc_id = aws_vpc.tsy-iabs-vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.tap_gig_nat_a.id
+    nat_gateway_id = aws_nat_gateway.tsy_iabs_nat_a.id
   }
 
   tags = {
-    Name = "tap-gig-route-table-private-a"
+    Name = "tsy-iabs-route-table-private-a"
   }
 }
 
 resource "aws_route_table_association" "private_a" {
   subnet_id      = aws_subnet.private_a.id
-  route_table_id = aws_route_table.tap_gig_route_table_private_a.id
+  route_table_id = aws_route_table.tsy_iabs_route_table_private_a.id
 }
 
 # Creating Private Route Table B for Subnet B
-resource "aws_route_table" "tap_gig_route_table_private_b" {
-  vpc_id = aws_vpc.tap_gig_vpc.id
+resource "aws_route_table" "tsy_iabs_route_table_private_b" {
+  vpc_id = aws_vpc.tsy-iabs-vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.tap_gig_nat_b.id
+    nat_gateway_id = aws_nat_gateway.tsy_iabs_nat_b.id
   }
 
   tags = {
-    Name = "tap-gig-route-table-private-b"
+    Name = "tsy-iabs-route-table-private-b"
   }
 }
 
 resource "aws_route_table_association" "private_b" {
   subnet_id      = aws_subnet.private_b.id
-  route_table_id = aws_route_table.tap_gig_route_table_private_b.id
-}
-
-# Creating Private Route Table C for Subnet C
-resource "aws_route_table" "tap_gig_route_table_private_c" {
-  vpc_id = aws_vpc.tap_gig_vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.tap_gig_nat_c.id
-  }
-
-  tags = {
-    Name = "tap-gig-route-table-private-c"
-  }
-}
-
-resource "aws_route_table_association" "private_c" {
-  subnet_id      = aws_subnet.private_c.id
-  route_table_id = aws_route_table.tap_gig_route_table_private_c.id
+  route_table_id = aws_route_table.tsy_iabs_route_table_private_b.id
 }
 
 # Creating Security Group for EC2 instances
 resource "aws_security_group" "instance" {
-  name_prefix = "tap-gig-instance-"
-  vpc_id      = aws_vpc.tap_gig_vpc.id
+  name_prefix = "tsy-iabs-instance-"
+  vpc_id      = aws_vpc.tsy-iabs-vpc.id
 
   # Ingress rules for allowing RDP and HTTP access from anywhere
   ingress {
@@ -245,8 +188,8 @@ resource "aws_security_group" "instance" {
 }
 
 resource "aws_security_group" "elb" {
-  name_prefix = "tap-gig-elb-"
-  vpc_id      = aws_vpc.tap_gig_vpc.id
+  name_prefix = "tsy-iabs-elb-"
+  vpc_id      = aws_vpc.tsy-iabs-vpc.id
 
   # Add inbound rules to allow traffic on port 80 and other necessary ports
   # You can customize the security group rules based on your application requirements.
@@ -277,28 +220,28 @@ resource "aws_security_group" "elb" {
 }
 
 # Creating Instance Profile
-resource "aws_iam_instance_profile" "tap_gig_instance_profile" {
-  name = "tap-gig-instance-profile"
+resource "aws_iam_instance_profile" "tsy_iabs_instance_profile" {
+  name = "tsy-iabs-instance-profile"
   role = aws_iam_role.codepipeline_codedeploy_role.id
 }
 
-# Defining the Elastic Beanstalk TAP-GIG Application
-resource "aws_elastic_beanstalk_application" "tap_gig_app" {
-  name        = "tap-gig-app"
-  description = "TAP-GIG Application - Sample ASP.NET Application"
+# Defining the Elastic Beanstalk TSY-IABS Application
+resource "aws_elastic_beanstalk_application" "tsy_iabs_app" {
+  name        = "tsy-iabs-app"
+  description = "TSY-IABS Application - Sample ASP.NET Application"
 }
 
-# # Defining the Elastic Beanstalk TAP-GIG Environment
-resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
-  name                = "tap-gig-env"
-  application         = aws_elastic_beanstalk_application.tap_gig_app.name
+# # Defining the Elastic Beanstalk TSY-IABS Environment
+resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
+  name                = "tsy-iabs-env"
+  application         = aws_elastic_beanstalk_application.tsy_iabs_app.name
   solution_stack_name = "64bit Windows Server 2019 v2.11.6 running IIS 10.0"
 
   # Configuring Elastic Beanstalk env with necessary settings
   setting {
     namespace = "aws:ec2:vpc"
     name      = "VPCId"
-    value     = aws_vpc.tap_gig_vpc.id
+    value     = aws_vpc.tsy-iabs-vpc.id
   }
 
   setting {
@@ -313,7 +256,7 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = aws_iam_instance_profile.tap_gig_instance_profile.name
+    value     = aws_iam_instance_profile.tsy_iabs_instance_profile.name
   }
 
   setting {
@@ -325,7 +268,7 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "EC2KeyName"
-    value     = "tap-gig-keypair"
+    value     = "tsy-iabs-keypair"
   }
 
   setting {
@@ -386,7 +329,7 @@ resource "aws_elastic_beanstalk_environment" "tap_gig_env" {
 #   user_data                   = file("install.sh")  # Replace with your user data script, if any
 
 #   # Attach the instance profile to launch configuration
-#   iam_instance_profile = aws_iam_instance_profile.tap_gig_instance_profile.name
+#   iam_instance_profile = aws_iam_instance_profile.tsy_iabs_instance_profile.name
 
 #   lifecycle {
 #     create_before_destroy = true

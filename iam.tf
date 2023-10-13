@@ -1,5 +1,5 @@
 resource "aws_iam_role" "codepipeline_codedeploy_role" {
-  name = "tap_gig_codepipeline_codedeploy_iam_role"
+  name = "tsy_iabs_codepipeline_codedeploy_iam_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

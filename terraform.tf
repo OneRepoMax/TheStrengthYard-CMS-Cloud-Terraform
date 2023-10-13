@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "tap-gig-terraform"
+    bucket = "tsy-iabs-terraform"
     key    = "terraform.tfstate"
     region = "ap-southeast-1"
   }
