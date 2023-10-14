@@ -1,4 +1,4 @@
-name: "Terraform apply action"
+name: "TSY AWS Terraform Deployment"
 # on:
 #   push:
 #     branches:
