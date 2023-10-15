@@ -6,3 +6,8 @@ variable "github_token" {
 variable "acl_value" {
     default = "private"
 }
+
+variable "db_password" {
+  description = "value of the db password"
+  type        = string
+}

@@ -43,9 +43,9 @@ resource "aws_codepipeline" "tsy_iabs_codepipeline" {
 
     # Please change the below Github configurations accordingly
       configuration = {
-        Owner             = "mukminpitoyo"
-        Repo              = "SampleDotNetBeanstalk"
-        Branch            = "main"
+        Owner             = "OneRepoMax"
+        Repo              = "TheStrengthYard-CMS-Service"
+        Branch            = "sprint4/booking_staff"
         OAuthToken        = var.github_token  # Define the GitHub token as a variable
       }
     }

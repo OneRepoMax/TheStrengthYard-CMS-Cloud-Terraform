@@ -38,7 +38,22 @@ resource "aws_iam_role" "codepipeline_codedeploy_role" {
         Principal = {
           Service = "elasticbeanstalk.amazonaws.com"
         }
-      }
+      },
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      },
+      # Cloudwatch
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudwatch.amazonaws.com"
+        }
+      },
     ]
   })
 }
@@ -74,5 +89,15 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_policy_attachment" {
 
 resource "aws_iam_role_policy_attachment" "elastic_beanstalk_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-AWSElasticBeanstalk"
+  role       = aws_iam_role.codepipeline_codedeploy_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "rds_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+  role       = aws_iam_role.codepipeline_codedeploy_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
   role       = aws_iam_role.codepipeline_codedeploy_role.name
 }

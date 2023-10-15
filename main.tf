@@ -5,6 +5,8 @@ provider "aws" {
 # Creating VPC, IGW
 resource "aws_vpc" "tsy-iabs-vpc" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
   tags = {
     Name = "TSY-IABS-VPC"
   }
@@ -169,6 +171,13 @@ resource "aws_security_group" "instance" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "MySQL from anywhere"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     description = "HTTPS from anywhere"
@@ -225,17 +234,48 @@ resource "aws_iam_instance_profile" "tsy_iabs_instance_profile" {
   role = aws_iam_role.codepipeline_codedeploy_role.id
 }
 
+# Creating RDS Subnet Group
+resource "aws_db_subnet_group" "tsy_iabs_db_subnet_group" {
+  name       = "tsy-iabs-db-subnet-group"
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+}
+
+# Creating RDS Instance
+resource "aws_db_instance" "tsy_iabs_db_instance" {
+  identifier            = "tsy-iabs-db-instance"
+  allocated_storage    = 20
+  storage_type          = "gp2"
+  engine                = "mysql"
+  engine_version        = "5.7"
+  instance_class        = "db.t3.micro"
+  name                  = "tsy_db"
+  username              = "admin"
+  password              = var.db_password
+  publicly_accessible  = true
+  multi_az              = true
+  skip_final_snapshot   = true
+
+  vpc_security_group_ids = [aws_security_group.instance.id]
+  db_subnet_group_name   = aws_db_subnet_group.tsy_iabs_db_subnet_group.name
+
+  backup_retention_period = 7
+
+  tags = {
+    Name = "tsy-iabs-db-instance"
+  }
+}
+
 # Defining the Elastic Beanstalk TSY-IABS Application
 resource "aws_elastic_beanstalk_application" "tsy_iabs_app" {
-  name        = "tsy-iabs-app"
-  description = "TSY-IABS Application - Sample ASP.NET Application"
+  name        = "tsy-iabs-be-app"
+  description = "TSY-IABS TheStrengthYard-CMS-Service Application"
 }
 
 # # Defining the Elastic Beanstalk TSY-IABS Environment
 resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   name                = "tsy-iabs-env"
   application         = aws_elastic_beanstalk_application.tsy_iabs_app.name
-  solution_stack_name = "64bit Windows Server 2019 v2.11.6 running IIS 10.0"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.0.1 running Docker"
 
   # Configuring Elastic Beanstalk env with necessary settings
   setting {
@@ -250,6 +290,37 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     value     = "${join(",", 
     [aws_subnet.private_a.id], 
     [aws_subnet.private_b.id])}"
+  }
+
+  # Pass RDS connection details to Elastic Beanstalk environment
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_HOST"
+    value     = aws_db_instance.tsy_iabs_db_instance.endpoint
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PORT"
+    value     = aws_db_instance.tsy_iabs_db_instance.port
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_NAME"
+    value     = aws_db_instance.tsy_iabs_db_instance.name
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_USER"
+    value     = aws_db_instance.tsy_iabs_db_instance.username
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PASSWORD"
+    value     = aws_db_instance.tsy_iabs_db_instance.password
   }
 
   setting {
@@ -279,7 +350,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = "2"
+    value     = "1"
   }
 
   setting {
