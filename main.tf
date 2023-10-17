@@ -257,11 +257,11 @@ resource "aws_db_instance" "tsy_iabs_db_instance" {
   allocated_storage    = 20
   storage_type          = "gp2"
   engine                = "mysql"
-  engine_version        = "5.7"
+  engine_version        = "8.0"
   instance_class        = "db.t3.micro"
   name                  = "tsy_db"
-  username              = "admin"
-  password              = var.db_password
+  username = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_USERNAME"]
+  password = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_PASSWORD"]
   publicly_accessible  = true
   multi_az              = true
   skip_final_snapshot   = true
@@ -269,9 +269,11 @@ resource "aws_db_instance" "tsy_iabs_db_instance" {
   vpc_security_group_ids = [aws_security_group.instance.id]
   db_subnet_group_name   = aws_db_subnet_group.tsy_iabs_db_subnet_group.name
 
+  allow_major_version_upgrade = true
+
   backup_retention_period = 7
   monitoring_interval = 60
-  max_allocated_storage = 40
+  max_allocated_storage = 100
 
   tags = {
     Name = "tsy-iabs-db-instance"
@@ -454,4 +456,5 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     name      = "SecurityGroups"
     value     = aws_security_group.elb.id
   }
+
 }

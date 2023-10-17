@@ -10,3 +10,7 @@ data "aws_secretsmanager_secret_version" "email_secrets" {
 data "aws_secretsmanager_secret_version" "chatbot_secrets" {
   secret_id = "tsy-iabs/chatbot"
 }
+
+data "aws_secretsmanager_secret_version" "rds_secrets" {
+  secret_id = "tsy-iabs/RDS-username-password"
+}
