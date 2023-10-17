@@ -234,6 +234,17 @@ resource "aws_iam_instance_profile" "tsy_iabs_instance_profile" {
   role = aws_iam_role.codepipeline_codedeploy_role.id
 }
 
+# Creating ACM Certificate for HTTPS
+resource "aws_acm_certificate" "tsy_iabs_certificate" {
+  domain_name       = "tsy-iabs.online"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
 # Creating RDS Subnet Group
 resource "aws_db_subnet_group" "tsy_iabs_db_subnet_group" {
   name       = "tsy-iabs-db-subnet-group"
@@ -259,6 +270,8 @@ resource "aws_db_instance" "tsy_iabs_db_instance" {
   db_subnet_group_name   = aws_db_subnet_group.tsy_iabs_db_subnet_group.name
 
   backup_retention_period = 7
+  monitoring_interval = 60
+  max_allocated_storage = 40
 
   tags = {
     Name = "tsy-iabs-db-instance"
@@ -324,6 +337,48 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SECURITY_PASSWORD_SALT"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.email_secrets.secret_string)["SECURITY_PASSWORD_SALT"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "EMAIL_USER"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.email_secrets.secret_string)["EMAIL_USER"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "EMAIL_PASSWORD"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.email_secrets.secret_string)["EMAIL_PASSWORD"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "PAYPAL_CLIENT_ID"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.paypal_secrets.secret_string)["PAYPAL_CLIENT_ID"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "PAYPAL_CLIENT_SECRET"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.paypal_secrets.secret_string)["PAYPAL_CLIENT_SECRET"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "OPENAI_API_KEY"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.chatbot_secrets.secret_string)["OPENAI_API_KEY"]
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "LANGCHAIN_API_KEY"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.chatbot_secrets.secret_string)["LANGCHAIN_API_KEY"]
+  }
+
+  setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
     value     = aws_iam_instance_profile.tsy_iabs_instance_profile.name
@@ -359,6 +414,20 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     value     = "classic"
   }
 
+  # Turn on Listener for HTTPS
+  setting {
+    namespace = "aws:elb:listener:443"
+    name      = "ListenerEnabled"
+    value     = "true"
+  }
+
+  # Configure ACM Certificate for HTTPS
+  setting {
+    namespace = "aws:elb:listener:443"
+    name      = "SSLCertificateId"
+    value     = aws_acm_certificate.tsy_iabs_certificate.arn
+  }
+
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
@@ -386,67 +455,3 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
     value     = aws_security_group.elb.id
   }
 }
-
-# Creating EC2 Launch Configuration and ASG -- Skipped!
-# resource "aws_launch_configuration" "tap_gig_lc" {
-#   name_prefix                 = "tap-gig-lc"
-#   image_id                    = "ami-0a720e9f14071b468"  # Microsoft Windows Server 2019 Base
-#   instance_type               = "t2.micro"  # Replace with your desired instance type
-#   security_groups             = [aws_security_group.instance.id]
-#   associate_public_ip_address = false
-#   key_name                    = "tap-gig-keypair"  # Replace with your EC2 key pair name
-#   user_data                   = file("install.sh")  # Replace with your user data script, if any
-
-#   # Attach the instance profile to launch configuration
-#   iam_instance_profile = aws_iam_instance_profile.tsy_iabs_instance_profile.name
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_autoscaling_group" "example" {
-#   name                 = "tap-gig-asg"
-#   launch_configuration = aws_launch_configuration.tap_gig_lc.name
-#   min_size             = 2  # Replace with your desired minimum number of instances
-#   max_size             = 4  # Replace with your desired maximum number of instances
-#   desired_capacity     = 2  # Replace with your desired initial number of instances
-#   vpc_zone_identifier  = [
-#     aws_subnet.private_a.id, 
-#     aws_subnet.private_b.id, 
-#     aws_subnet.private_c.id
-#     ]
-#   health_check_type    = "ELB"
-#   load_balancers       = [aws_elb.tap_gig_elb.name]
-#   tags = [
-#     {
-#       key                 = "Name"
-#       value               = "tap-gig-asg"
-#       propagate_at_launch = true
-#     }
-#   ]
-# }
-
-# Creating ELB -- Skipped! Beanstalk will do this for us
-# resource "aws_elb" "tap_gig_elb" {
-#   name               = "tap-gig-elb"
-#   subnets            = [
-#     aws_subnet.public_a.id,
-#     aws_subnet.public_b.id,
-#     aws_subnet.public_c.id
-#     ]
-#   security_groups    = [aws_security_group.elb.id]
-#   cross_zone_load_balancing  = true
-#   idle_timeout       = 400
-#   connection_draining = true
-#   connection_draining_timeout = 300
-#   tags = {
-#     Name = "tap-gig-elb"
-#   }
-#   listener {
-#     instance_port     = 80
-#     instance_protocol = "http"
-#     lb_port           = 80
-#     lb_protocol       = "http"
-#   }
-# }
