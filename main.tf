@@ -310,7 +310,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   # Pass RDS connection details to Elastic Beanstalk environment
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_HOST"
+    name      = "DB_HOSTNAME"
     value     = aws_db_instance.tsy_iabs_db_instance.endpoint
   }
 
@@ -328,7 +328,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_USER"
+    name      = "DB_USERNAME"
     value     = aws_db_instance.tsy_iabs_db_instance.username
   }
 
