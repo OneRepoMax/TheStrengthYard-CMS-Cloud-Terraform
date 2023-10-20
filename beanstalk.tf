@@ -8,7 +8,7 @@ resource "aws_elastic_beanstalk_application" "tsy_iabs_app" {
 resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   name                = "tsy-iabs-env"
   application         = aws_elastic_beanstalk_application.tsy_iabs_app.name
-  solution_stack_name = "64bit Amazon Linux 2023 v4.0.1 running Docker"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.1.0 running Docker"
 
   # Configuring Elastic Beanstalk env with necessary settings
   setting {
@@ -119,13 +119,13 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.micro"
+    value     = "t2.medium"
   }
 
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = "1"
+    value     = "2"
   }
 
   setting {
