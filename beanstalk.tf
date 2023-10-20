@@ -29,31 +29,31 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DB_HOSTNAME"
-    value     = aws_db_instance.tsy_iabs_db_instance.endpoint
+    value     = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_HOSTNAME"]
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DB_PORT"
-    value     = aws_db_instance.tsy_iabs_db_instance.port
+    value     = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_PORT"]
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DB_NAME"
-    value     = aws_db_instance.tsy_iabs_db_instance.name
+    value     = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_NAME"]
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DB_USERNAME"
-    value     = aws_db_instance.tsy_iabs_db_instance.username
+    value     = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_USERNAME"]
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DB_PASSWORD"
-    value     = aws_db_instance.tsy_iabs_db_instance.password
+    value     = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_PASSWORD"]
   }
 
   setting {

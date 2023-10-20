@@ -244,36 +244,36 @@ resource "aws_acm_certificate" "tsy_iabs_certificate" {
   }
 }
 
-# Creating RDS Subnet Group
-resource "aws_db_subnet_group" "tsy_iabs_db_subnet_group" {
-  name       = "tsy-iabs-db-subnet-group"
-  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
-}
+# # Creating RDS Subnet Group
+# resource "aws_db_subnet_group" "tsy_iabs_db_subnet_group" {
+#   name       = "tsy-iabs-db-subnet-group"
+#   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+# }
 
-# Creating RDS Instance
-resource "aws_db_instance" "tsy_iabs_db_instance" {
-  identifier            = "tsy-iabs-db-instance"
-  allocated_storage    = 20
-  storage_type          = "gp2"
-  engine                = "mysql"
-  engine_version        = "8.0"
-  instance_class        = "db.t3.micro"
-  username = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_USERNAME"]
-  password = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_PASSWORD"]
-  publicly_accessible  = true
-  multi_az              = true
-  skip_final_snapshot   = true
+# # Creating RDS Instance
+# resource "aws_db_instance" "tsy_iabs_db_instance" {
+#   identifier            = "tsy-iabs-db-instance"
+#   allocated_storage    = 20
+#   storage_type          = "gp2"
+#   engine                = "mysql"
+#   engine_version        = "8.0"
+#   instance_class        = "db.t3.micro"
+#   username = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_USERNAME"]
+#   password = jsondecode(data.aws_secretsmanager_secret_version.rds_secrets.secret_string)["DB_PASSWORD"]
+#   publicly_accessible  = true
+#   multi_az              = true
+#   skip_final_snapshot   = true
 
-  vpc_security_group_ids = [aws_security_group.instance.id]
-  db_subnet_group_name   = aws_db_subnet_group.tsy_iabs_db_subnet_group.name
+#   vpc_security_group_ids = [aws_security_group.instance.id]
+#   db_subnet_group_name   = aws_db_subnet_group.tsy_iabs_db_subnet_group.name
 
-  allow_major_version_upgrade = true
+#   allow_major_version_upgrade = true
 
-  backup_retention_period = 7
-  monitoring_interval = 60
-  max_allocated_storage = 100
+#   backup_retention_period = 7
+#   monitoring_interval = 60
+#   max_allocated_storage = 100
 
-  tags = {
-    Name = "tsy-iabs-db-instance"
-  }
-}
+#   tags = {
+#     Name = "tsy-iabs-db-instance"
+#   }
+# }
