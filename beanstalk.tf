@@ -125,7 +125,7 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = "2"
+    value     = "1"
   }
 
   setting {
