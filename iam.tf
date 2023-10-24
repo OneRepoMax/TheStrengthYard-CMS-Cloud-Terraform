@@ -8,20 +8,6 @@ resource "aws_iam_role" "tsy_iabs_iam_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          Service = "codepipeline.amazonaws.com"
-        }
-      },
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "codedeploy.amazonaws.com"
-        }
-      },
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
           Service = "s3.amazonaws.com"
         }
       },
@@ -56,18 +42,6 @@ resource "aws_iam_role" "tsy_iabs_iam_role" {
       },
     ]
   })
-}
-
-resource "aws_iam_policy_attachment" "codepipeline_policy_attachment" {
-  name       = "MyCodePipelinePolicyAttachment"
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess"
-  roles      = [aws_iam_role.tsy_iabs_iam_role.name]
-}
-
-resource "aws_iam_policy_attachment" "codedeploy_policy_attachment" {
-  name       = "MyCodeDeployPolicyAttachment"
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployFullAccess"
-  roles      = [aws_iam_role.tsy_iabs_iam_role.name]
 }
 
 resource "aws_iam_policy_attachment" "s3_policy_attachment" {
