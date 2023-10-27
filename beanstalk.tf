@@ -99,6 +99,12 @@ resource "aws_elastic_beanstalk_environment" "tsy_iabs_env" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "JWT_SECRET_KEY"
+    value     = jsondecode(data.aws_secretsmanager_secret_version.jwt_secrets.secret_string)["LANGCHAIN_API_KEY"]
+  }
+
+  setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
     value     = aws_iam_instance_profile.tsy_iabs_instance_profile.name

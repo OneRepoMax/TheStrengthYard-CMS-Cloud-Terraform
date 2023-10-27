@@ -14,3 +14,8 @@ data "aws_secretsmanager_secret_version" "chatbot_secrets" {
 data "aws_secretsmanager_secret_version" "rds_secrets" {
   secret_id = "tsy-iabs/RDS-username-password"
 }
+
+data "aws_secretsmanager_secret_version" "jwt_secrets" {
+  secret_id = "tsy-iabs/jwt"
+}
+
